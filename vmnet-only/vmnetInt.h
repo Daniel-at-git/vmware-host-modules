@@ -41,8 +41,13 @@
     compat_skb_set_network_header(skb, sizeof (struct ethhdr)),  \
     dev_queue_xmit(skb)                                   \
   )
-#define dev_lock_list()    read_lock(&dev_base_lock)
-#define dev_unlock_list()  read_unlock(&dev_base_lock)
+#if LINUX_VERSION_CODE < KERNEL_VERSION(6,9,0)
+   #define dev_lock_list()    read_lock(&dev_base_lock)
+   #define dev_unlock_list()  read_unlock(&dev_base_lock)
+#else
+   #define dev_lock_list()    rtnl_lock()
+   #define dev_unlock_list()  rtnl_unlock()
+#endif
 
 
 extern struct proto vmnet_proto;
